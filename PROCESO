@@ -1,0 +1,60 @@
+-- Desactivar las comprobaciones de claves foráneas (evita errores al eliminar claves primarias con restricciones de clave foránea)
+SET FOREIGN_KEY_CHECKS=0;
+
+-- **Eliminar claves primarias de todas las tablas**
+-- Elimina las claves primarias de las siguientes tablas:
+-- * cliente: Elimina la clave primaria de la tabla `cliente`.
+-- * detalle_pedido: Elimina la clave primaria de la tabla `detalle_pedido`.
+-- * empleado: Elimina la clave primaria de la tabla `empleado`.
+-- * gama_producto: Elimina la clave primaria de la tabla `gama_producto`.
+-- * oficina: Elimina la clave primaria de la tabla `oficina`.
+-- * pago: Elimina la clave primaria de la tabla `pago`.
+-- * pedido: Elimina la clave primaria de la tabla `pedido`.
+-- * producto: Elimina la clave primaria de la tabla `producto`.
+ALTER TABLE cliente DROP PRIMARY KEY;
+ALTER TABLE detalle_pedido DROP PRIMARY KEY;
+ALTER TABLE empleado DROP PRIMARY KEY;
+ALTER TABLE gama_producto DROP PRIMARY KEY;
+ALTER TABLE oficina DROP PRIMARY KEY;
+ALTER TABLE pago DROP PRIMARY KEY;
+ALTER TABLE pedido DROP PRIMARY KEY;
+ALTER TABLE producto DROP PRIMARY KEY;
+
+-- **Restablecer el conteo de datos**
+-- Inicializa las variables `@n` y `@m` a 0 para llevar un conteo de los valores de ID.
+SET @n := 0;
+SET @m := 0;
+
+-- Actualiza el conteo de datos para cada tabla:
+-- * cliente: Actualiza el valor de la columna `codigo_cliente` con un valor incremental, ordenando por `codigo_cliente`.
+UPDATE cliente SET codigo_cliente = @n := @n + 1 ORDER BY codigo_cliente;
+-- * detalle_pedido: Actualiza los valores de las columnas `codigo_pedido` y `numero_linea` con valores incrementales, ordenando por `codigo_pedido` y `numero_linea`.
+UPDATE detalle_pedido SET codigo_pedido = @n := @n + 1, numero_linea = @m := @m + 1 ORDER BY codigo_pedido, numero_linea;
+-- * empleado: Actualiza el valor de la columna `codigo_empleado` con un valor incremental, ordenando por `codigo_empleado`.
+UPDATE empleado SET codigo_empleado = @n := @n + 1 ORDER BY codigo_empleado;
+-- * pedido: Actualiza el valor de la columna `codigo_pedido` con un valor incremental, ordenando por `codigo_pedido`.
+UPDATE pedido SET codigo_pedido = @n := @n + 1 ORDER BY codigo_pedido;
+-- * producto: Actualiza el valor de la columna `codigo_producto` con un valor incremental, ordenando por `codigo_producto`.
+UPDATE producto SET codigo_producto = @n := @n + 1 ORDER BY codigo_producto;
+
+-- Reactivar las comprobaciones de claves foráneas (habilita las restricciones de clave foránea nuevamente)
+SET FOREIGN_KEY_CHECKS=1;
+
+-- **Reconstruir claves primarias**
+-- Vuelve a crear las claves primarias para todas las tablas, utilizando las mismas columnas que antes:
+-- * cliente: Crea una clave primaria en la columna `codigo_cliente`.
+ALTER TABLE cliente ADD PRIMARY KEY (codigo_cliente);
+-- * detalle_pedido: Crea una clave primaria en las columnas `codigo_pedido` y `codigo_producto`.
+ALTER TABLE detalle_pedido ADD PRIMARY KEY (codigo_pedido, codigo_producto);
+-- * empleado: Crea una clave primaria en la columna `codigo_empleado`.
+ALTER TABLE empleado ADD PRIMARY KEY (codigo_empleado);
+-- * gama_producto: Crea una clave primaria en la columna `gama`.
+ALTER TABLE gama_producto ADD PRIMARY KEY (gama);
+-- * oficina: Crea una clave primaria en la columna `codigo_oficina`.
+ALTER TABLE oficina ADD PRIMARY KEY (codigo_oficina);
+-- * pago: Crea una clave primaria en las columnas `codigo_cliente` e `id_transaccion`.
+ALTER TABLE pago ADD PRIMARY KEY (codigo_cliente, id_transaccion);
+-- * pedido: Crea una clave primaria en la columna `codigo_pedido`.
+ALTER TABLE pedido ADD PRIMARY KEY (codigo_pedido);
+-- * producto: Crea una clave primaria en la columna `codigo_producto`.
+ALTER TABLE producto ADD PRIMARY KEY (codigo_producto);
